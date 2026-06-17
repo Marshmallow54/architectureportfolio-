@@ -61,6 +61,20 @@ export default async function ProjectDetail({
                     </section>
                 )}
 
+                {/* Embedded PDF */}
+                {project.pdfFile && (
+                    <section className="mb-16 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                        <span className="text-caption block mb-6">PDF Document</span>
+                        <div className="w-full border border-border rounded-sm overflow-hidden bg-secondary" style={{ height: "800px" }}>
+                            <iframe
+                                src={project.pdfFile}
+                                className="w-full h-full"
+                                title={`${project.title} — PDF Document`}
+                            />
+                        </div>
+                    </section>
+                )}
+
                 {/* Technical */}
                 <section className="animate-fade-in" style={{ animationDelay: "0.25s" }}>
                     <span className="text-caption block mb-6">Technical Thinking</span>

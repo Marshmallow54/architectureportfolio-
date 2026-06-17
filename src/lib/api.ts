@@ -7,6 +7,7 @@ export interface ApiProject {
     location: string;
     statement: string;
     gallery: string[];
+    pdfFile?: string;
     materials: string;
     sturucture: string; // Note: Typo in the API
     sustainability: string;
@@ -25,8 +26,7 @@ const API_BASE_URL = "https://ege.gezici.co.uk";
 
 export async function getProjects(): Promise<ApiProject[]> {
     const res = await fetch(`${API_BASE_URL}/`, {
-        // Next.js page/component level caching can be adjusted here if needed, 
-        // using standard fetch cache options like `{ next: { revalidate: 3600 } }`
+        cache: "no-store",
     });
 
     if (!res.ok) {
@@ -43,7 +43,9 @@ export async function getProjects(): Promise<ApiProject[]> {
 }
 
 export async function getProjectBySlug(slug: string): Promise<ApiProject | null> {
-    const res = await fetch(`${API_BASE_URL}/${slug}`);
+    const res = await fetch(`${API_BASE_URL}/${slug}`, {
+        cache: "no-store",
+    });
 
     if (!res.ok) {
         if (res.status === 404) return null;
