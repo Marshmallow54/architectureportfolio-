@@ -16,6 +16,8 @@ export default async function ProjectDetail({
         notFound();
     }
 
+    const galleryItems = project.gallery?.flatMap((group) => group.items ?? []) ?? [];
+
     return (
         <Layout>
             {/* Hero image */}
@@ -43,19 +45,28 @@ export default async function ProjectDetail({
                 </div>
 
                 {/* Gallery */}
-                {project.gallery && project.gallery.length > 0 && (
+                {galleryItems.length > 0 && (
                     <section className="mb-16 animate-fade-in" style={{ animationDelay: "0.15s" }}>
                         <span className="text-caption block mb-6">Project Gallery</span>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-grid">
-                            {project.gallery.map((img, i) => (
-                                <div key={i} className="aspect-[4/3] bg-secondary overflow-hidden">
-                                    <img
-                                        src={img}
-                                        alt={`${project.title} — ${i + 1}`}
-                                        className="w-full h-full object-cover"
-                                        loading="lazy"
-                                    />
-                                </div>
+                        <div className="flex flex-col gap-16">
+                            {galleryItems.map((item) => (
+                                <article key={item._id} className="line-rule pt-8 first:pt-0 first:border-t-0">
+                                    <div className="aspect-[16/10] bg-secondary overflow-hidden mb-6">
+                                        <img
+                                            src={item.image}
+                                            alt={item.name}
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                    <h3 className="text-subheading mb-4">{item.name}</h3>
+                                    {item.content && (
+                                        <div
+                                            className="text-body-sm text-muted-foreground leading-relaxed max-w-2xl [&_p]:mb-4 [&_p:last-child]:mb-0"
+                                            dangerouslySetInnerHTML={{ __html: item.content }}
+                                        />
+                                    )}
+                                </article>
                             ))}
                         </div>
                     </section>

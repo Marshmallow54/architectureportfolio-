@@ -1,3 +1,14 @@
+export interface GalleryItem {
+    name: string;
+    image: string;
+    content: string;
+    _id: string;
+}
+
+export interface GalleryGroup {
+    items: GalleryItem[];
+}
+
 export interface ApiProject {
     id: number;
     title: string;
@@ -6,8 +17,8 @@ export interface ApiProject {
     image: string;
     location: string;
     statement: string;
-    gallery: string[];
-    pdfFile?: string;
+    gallery: GalleryGroup[];
+    pdfFile?: string | null;
     materials: string;
     sturucture: string; // Note: Typo in the API
     sustainability: string;
