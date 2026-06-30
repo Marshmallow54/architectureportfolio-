@@ -62,7 +62,17 @@ export default function Footer() {
 
                 <div className="max-w-6xl mx-auto mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between gap-3">
                     <span className="text-caption">© {new Date().getFullYear()} {contact.name}</span>
-                    <span className="text-caption">Architecture Portfolio</span>
+                    <span className="text-caption">
+                        Developed by{" "}
+                        <a
+                            href="https://www.tufangokmenler.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-muted-foreground hover:text-foreground transition-colors duration-300"
+                        >
+                            Tufan Gökmenler
+                        </a>
+                    </span>
                 </div>
             </div>
         </footer>
