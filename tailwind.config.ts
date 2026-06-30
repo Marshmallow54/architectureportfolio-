@@ -14,12 +14,15 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'Times New Roman', 'serif'],
       },
       fontSize: {
-        'display': ['clamp(2.5rem, 6vw, 5.5rem)', { lineHeight: '0.95', letterSpacing: '-0.04em', fontWeight: '800' }],
-        'heading': ['clamp(1.5rem, 3vw, 2.5rem)', { lineHeight: '1.1', letterSpacing: '-0.03em', fontWeight: '700' }],
-        'subheading': ['clamp(1rem, 1.5vw, 1.25rem)', { lineHeight: '1.3', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'display': ['clamp(2.75rem, 7vw, 6rem)', { lineHeight: '0.92', letterSpacing: '-0.03em', fontWeight: '500' }],
+        'heading': ['clamp(1.75rem, 3.5vw, 3rem)', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '500' }],
+        'subheading': ['clamp(1.125rem, 1.8vw, 1.5rem)', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '500' }],
+        'body-lg': ['clamp(1rem, 1.4vw, 1.125rem)', { lineHeight: '1.75', letterSpacing: '0' }],
+        'body': ['0.9375rem', { lineHeight: '1.75', letterSpacing: '0' }],
         'body-sm': ['0.8125rem', { lineHeight: '1.7', letterSpacing: '0' }],
       },
       colors: {
@@ -28,6 +31,11 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        stone: {
+          DEFAULT: "hsl(var(--stone))",
+          light: "hsl(var(--stone-light))",
+        },
+        charcoal: "hsl(var(--charcoal))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -56,16 +64,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,7 +72,7 @@ export default {
       },
       spacing: {
         'grid': '1.5rem',
-        'section': 'clamp(4rem, 10vw, 8rem)',
+        'section': 'clamp(5rem, 12vw, 9rem)',
       },
       keyframes: {
         "accordion-down": {
@@ -86,14 +84,22 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(8px)" },
+          from: { opacity: "0", transform: "translateY(12px)" },
           to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "scroll-cue": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.6s ease-out forwards",
+        "fade-in": "fade-in 0.8s ease-out forwards",
+        "scroll-cue": "scroll-cue 1.8s ease-in-out infinite",
+      },
+      transitionTimingFunction: {
+        editorial: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
     },
   },

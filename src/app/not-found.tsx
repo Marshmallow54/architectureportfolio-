@@ -1,25 +1,24 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
+import Layout from "@/components/Layout";
 
 export default function NotFound() {
-    const pathname = usePathname();
-
-    useEffect(() => {
-        console.error("404 Error: User attempted to access non-existent route:", pathname);
-    }, [pathname]);
-
     return (
-        <div className="flex min-h-screen items-center justify-center bg-muted">
-            <div className="text-center">
-                <h1 className="mb-4 text-4xl font-bold">404</h1>
-                <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-                <Link href="/" className="text-primary underline hover:text-primary/90">
-                    Return to Home
-                </Link>
-            </div>
-        </div>
+        <Layout>
+            <section className="px-6 md:px-12 py-section min-h-[60vh] flex items-center">
+                <div className="max-w-xl">
+                    <span className="text-caption block mb-4">404</span>
+                    <h1 className="font-serif text-heading mb-4">Page not found</h1>
+                    <p className="text-body text-muted-foreground mb-8">
+                        The page you are looking for does not exist or may have been moved.
+                    </p>
+                    <Link
+                        href="/"
+                        className="text-caption border border-border px-5 py-3 inline-block hover:bg-foreground hover:text-background transition-colors duration-500"
+                    >
+                        Return Home
+                    </Link>
+                </div>
+            </section>
+        </Layout>
     );
 }

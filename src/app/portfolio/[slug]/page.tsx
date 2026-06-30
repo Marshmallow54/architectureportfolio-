@@ -1,135 +1,166 @@
 import Link from "next/link";
 import Layout from "@/components/Layout";
+import ProjectGallery from "@/components/ProjectGallery";
+import NextProjectLink from "@/components/NextProjectLink";
+import ScrollReveal from "@/components/ScrollReveal";
+import ScrollFrameSequence from "@/components/ScrollFrameSequence";
 import { getProjectBySlug, getProjects } from "@/lib/api";
+import { getFrameSequenceForSlug } from "@/lib/frame-sequence";
+import {
+    formatProjectYear,
+    getNextProject,
+    getProjectSummary,
+    groupGalleryItems,
+    hasTechnicalContent,
+} from "@/lib/projects";
 import { notFound } from "next/navigation";
-
-// Next.js App Router uses `params` prop for dynamic routes
 export default async function ProjectDetail({
     params,
 }: {
-    params: Promise<{ slug: string }>
+    params: Promise<{ slug: string }>;
 }) {
     const resolvedParams = await params;
-    const project = await getProjectBySlug(resolvedParams.slug);
+    const [project, allProjects] = await Promise.all([
+        getProjectBySlug(resolvedParams.slug),
+        getProjects(),
+    ]);
 
     if (!project) {
         notFound();
     }
 
-    const galleryItems = project.gallery?.flatMap((group) => group.items ?? []) ?? [];
+    const summary = getProjectSummary(project);
+    const gallerySections = groupGalleryItems(project);
+    const nextProject = getNextProject(allProjects, project.slug);
+    const year = formatProjectYear(project.year);
+    const frameSequence = getFrameSequenceForSlug(project.slug);
+    const hasFrameSequence = frameSequence !== null;
 
     return (
-        <Layout>
-            {/* Hero image */}
-            <div className="w-full aspect-[16/7] bg-secondary overflow-hidden">
-                <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
+        <Layout overlayNav={hasFrameSequence} hideMainOffset={hasFrameSequence}>
+            {frameSequence ? (
+                <ScrollFrameSequence
+                    frames={frameSequence.frames}
+                    label={`${project.title} — Process Sequence`}
+                    scrollHeightVh={frameSequence.scrollHeightVh}
                 />
-            </div>
-
-            <article className="px-6 md:px-12 pt-12 pb-section max-w-5xl">
-                {/* Header */}
-                <div className="mb-12 animate-fade-in">
-                    <h1 className="text-heading mb-4">{project.title}</h1>
-                    <div className="flex flex-wrap gap-x-8 gap-y-1 text-caption mb-8">
-                        <span>{project.year.substring(0, 4)}</span>
-                        <span>{project.location}</span>
-                    </div>
-                    <div className="line-rule pt-8">
-                        <p className="text-body-sm text-muted-foreground max-w-2xl leading-relaxed whitespace-pre-wrap">
-                            {project.statement}
-                        </p>
-                    </div>
+            ) : (
+                <div className="relative w-full min-h-[55vh] md:min-h-[70vh] bg-stone overflow-hidden">
+                    <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-full min-h-[55vh] md:min-h-[70vh] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 via-transparent to-transparent" />
                 </div>
+            )}
+            <article className="px-6 md:px-12 py-section">
+                <div className="max-w-6xl mx-auto">
+                    <ScrollReveal>
+                        <div className="editorial-grid mb-16 md:mb-20">
+                            <div className="col-span-12 lg:col-span-8">
+                                <span className="text-caption block mb-4">Project</span>
+                                <h1 className="font-serif text-display mb-6">{project.title}</h1>
+                            </div>
+                            <div className="col-span-12 lg:col-span-4 lg:text-right flex flex-col lg:items-end gap-3 pt-2">
+                                <span className="text-caption">{year}</span>
+                                <span className="text-caption">{project.location}</span>
+                            </div>
+                        </div>
+                    </ScrollReveal>
 
-                {/* Gallery */}
-                {galleryItems.length > 0 && (
-                    <section className="mb-16 animate-fade-in" style={{ animationDelay: "0.15s" }}>
-                        <span className="text-caption block mb-6">Project Gallery</span>
-                        <div className="flex flex-col gap-16">
-                            {galleryItems.map((item) => (
-                                <article key={item._id} className="line-rule pt-8 first:pt-0 first:border-t-0">
-                                    <div className="aspect-[16/10] bg-secondary overflow-hidden mb-6">
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                    <h3 className="text-subheading mb-4">{item.name}</h3>
-                                    {item.content && (
-                                        <div
-                                            className="text-body-sm text-muted-foreground leading-relaxed max-w-2xl [&_p]:mb-4 [&_p:last-child]:mb-0"
-                                            dangerouslySetInnerHTML={{ __html: item.content }}
-                                        />
+                    {summary && (
+                        <ScrollReveal delay={80}>
+                            <section className="mb-section pb-section border-b border-border">
+                                <span className="text-caption block mb-6">Summary</span>
+                                <p className="text-body-lg text-muted-foreground leading-relaxed max-w-3xl whitespace-pre-wrap">
+                                    {summary}
+                                </p>
+                            </section>
+                        </ScrollReveal>
+                    )}
+
+                    {gallerySections.length > 0 && (
+                        <section className="mb-section">
+                            <ProjectGallery sections={gallerySections} />
+                        </section>
+                    )}
+
+                    {project.pdfFile && (
+                        <ScrollReveal>
+                            <section className="mb-section pb-section border-b border-border">
+                                <span className="text-caption block mb-6">Document</span>
+                                <div
+                                    className="w-full border border-border overflow-hidden bg-stone"
+                                    style={{ height: "min(800px, 80vh)" }}
+                                >
+                                    <iframe
+                                        src={project.pdfFile}
+                                        className="w-full h-full"
+                                        title={`${project.title} — PDF Document`}
+                                    />
+                                </div>
+                            </section>
+                        </ScrollReveal>
+                    )}
+
+                    {hasTechnicalContent(project) && (
+                        <ScrollReveal>
+                            <section className="mb-section pb-section border-b border-border">
+                                <span className="text-caption block mb-8">Technical Thinking</span>
+                                <div className="editorial-grid gap-y-10">
+                                    {project.materials && (
+                                        <div className="col-span-12 md:col-span-4 line-rule pt-6 md:pt-0 md:border-t-0">
+                                            <h4 className="text-caption mb-4">Materials</h4>
+                                            <p className="text-body-sm text-muted-foreground leading-relaxed">
+                                                {project.materials}
+                                            </p>
+                                        </div>
                                     )}
-                                </article>
-                            ))}
-                        </div>
-                    </section>
-                )}
+                                    {project.sturucture && (
+                                        <div className="col-span-12 md:col-span-4 line-rule pt-6 md:pt-0 md:border-t-0">
+                                            <h4 className="text-caption mb-4">Structure</h4>
+                                            <p className="text-body-sm text-muted-foreground leading-relaxed">
+                                                {project.sturucture}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {project.sustainability && (
+                                        <div className="col-span-12 md:col-span-4 line-rule pt-6 md:pt-0 md:border-t-0">
+                                            <h4 className="text-caption mb-4">Sustainability</h4>
+                                            <p className="text-body-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                                                {project.sustainability}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        </ScrollReveal>
+                    )}
 
-                {/* Embedded PDF */}
-                {project.pdfFile && (
-                    <section className="mb-16 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                        <span className="text-caption block mb-6">PDF Document</span>
-                        <div className="w-full border border-border rounded-sm overflow-hidden bg-secondary" style={{ height: "800px" }}>
-                            <iframe
-                                src={project.pdfFile}
-                                className="w-full h-full"
-                                title={`${project.title} — PDF Document`}
-                            />
-                        </div>
-                    </section>
-                )}
+                    {nextProject && <NextProjectLink project={nextProject} />}
 
-                {/* Technical */}
-                <section className="animate-fade-in" style={{ animationDelay: "0.25s" }}>
-                    <span className="text-caption block mb-6">Technical Thinking</span>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-grid">
-                        <div className="line-rule pt-4">
-                            <h4 className="text-caption mb-3">Materials</h4>
-                            <p className="text-body-sm text-muted-foreground">
-                                {project.materials}
-                            </p>
-                        </div>
-                        <div className="line-rule pt-4">
-                            <h4 className="text-caption mb-3">Structure</h4>
-                            <p className="text-body-sm text-muted-foreground">
-                                {project.sturucture}
-                            </p>
-                        </div>
-                        <div className="line-rule pt-4">
-                            <h4 className="text-caption mb-3">Sustainability</h4>
-                            <p className="text-body-sm text-muted-foreground whitespace-pre-wrap">
-                                {project.sustainability}
-                            </p>
-                        </div>
+                    <div className="mt-12">
+                        <Link
+                            href="/portfolio"
+                            className="text-caption hover:opacity-70 transition-opacity duration-300"
+                        >
+                            ← All Works
+                        </Link>
                     </div>
-                </section>
-
-                <div className="mt-16">
-                    <Link href="/portfolio" className="text-body-sm text-muted-foreground hover-lift">
-                        ← All Projects
-                    </Link>
                 </div>
             </article>
         </Layout>
     );
 }
 
-// Ensure static generation for all known projects
 export async function generateStaticParams() {
     try {
         const projects = await getProjects();
         return projects.map((project) => ({
             slug: project.slug,
         }));
-    } catch (e) {
-        // Fallback for build time if API fails during generation
+    } catch {
         return [];
     }
 }
