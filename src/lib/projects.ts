@@ -25,77 +25,8 @@ export function getNextProject(
     return projects[(index + 1) % projects.length];
 }
 
-export type GallerySectionKey = "concept" | "process" | "outcome" | "gallery";
-
-export interface GroupedGallerySection {
-    key: GallerySectionKey;
-    label: string;
-    items: GalleryItem[];
-}
-
-const SECTION_MATCHERS: { key: GallerySectionKey; label: string; keywords: string[] }[] = [
-    {
-        key: "concept",
-        label: "Concept",
-        keywords: ["research", "site plan", "context", "analysis"],
-    },
-    {
-        key: "process",
-        label: "Process",
-        keywords: [
-            "design development",
-            "plan drawing",
-            "axonometric",
-            "sketch",
-            "model",
-            "development",
-            "section",
-            "elevation",
-        ],
-    },
-    {
-        key: "outcome",
-        label: "Outcome",
-        keywords: ["final", "render", "proposed", "outcome"],
-    },
-];
-
-function classifyGalleryItem(name: string): GallerySectionKey {
-    const normalized = name.toLowerCase().trim();
-
-    for (const section of SECTION_MATCHERS) {
-        if (section.keywords.some((keyword) => normalized.includes(keyword))) {
-            return section.key;
-        }
-    }
-
-    return "gallery";
-}
-
-export function groupGalleryItems(project: ApiProject): GroupedGallerySection[] {
-    const items = project.gallery?.flatMap((group) => group.items ?? []) ?? [];
-    const buckets: Record<GallerySectionKey, GalleryItem[]> = {
-        concept: [],
-        process: [],
-        outcome: [],
-        gallery: [],
-    };
-
-    for (const item of items) {
-        buckets[classifyGalleryItem(item.name || "")].push(item);
-    }
-
-    const ordered: GroupedGallerySection[] = SECTION_MATCHERS.map(({ key, label }) => ({
-        key,
-        label,
-        items: buckets[key],
-    }));
-
-    if (buckets.gallery.length > 0) {
-        ordered.push({ key: "gallery", label: "Gallery", items: buckets.gallery });
-    }
-
-    return ordered.filter((section) => section.items.length > 0);
+export function getGalleryItems(project: ApiProject): GalleryItem[] {
+    return project.gallery?.flatMap((group) => group.items ?? []) ?? [];
 }
 
 export function hasTechnicalContent(project: ApiProject): boolean {

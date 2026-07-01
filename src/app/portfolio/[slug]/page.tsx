@@ -10,7 +10,7 @@ import {
     formatProjectYear,
     getNextProject,
     getProjectSummary,
-    groupGalleryItems,
+    getGalleryItems,
     hasTechnicalContent,
 } from "@/lib/projects";
 import { notFound } from "next/navigation";
@@ -30,7 +30,7 @@ export default async function ProjectDetail({
     }
 
     const summary = getProjectSummary(project);
-    const gallerySections = groupGalleryItems(project);
+    const galleryItems = getGalleryItems(project);
     const nextProject = getNextProject(allProjects, project.slug);
     const year = formatProjectYear(project.year);
     const frameSequence = getFrameSequenceForSlug(project.slug);
@@ -80,9 +80,9 @@ export default async function ProjectDetail({
                         </ScrollReveal>
                     )}
 
-                    {gallerySections.length > 0 && (
+                    {galleryItems.length > 0 && (
                         <section className="mb-section">
-                            <ProjectGallery sections={gallerySections} />
+                            <ProjectGallery items={galleryItems} />
                         </section>
                     )}
 
